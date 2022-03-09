@@ -32,7 +32,9 @@ jobs:
 
       - name: Build and Deploy
         run: docker buildx build --platform=${{ env.architectures }}
-          -t ghcr.io/${{ github.repository }}:${{ env.TAG_NAME }} --push .
+          -t ghcr.io/${{ github.repository }}:${{ env.TAG_NAME }}
+          -t ghcr.io/${{ github.repository }}:latest
+          --push .
 
       - name: Create a GitHub release
         uses: actions/create-release@v1

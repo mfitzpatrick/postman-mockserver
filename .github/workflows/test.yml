@@ -35,7 +35,7 @@ jobs:
           echo "Buildx Platforms: ${{ steps.docker_buildx.outputs.platforms }}"
           echo "QEMU Platforms: ${{ steps.docker_qemu.outputs.platforms }}"
 
-      - name: Build and Deploy
+      - name: Build
         run: docker buildx build --platform=${{ env.architectures }}
           -t ghcr.io/${{ github.repository }}:${{ env.TAG_NAME }} --output "type=local,dest=docker_output"
           .
