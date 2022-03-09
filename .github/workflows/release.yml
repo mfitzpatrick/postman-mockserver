@@ -1,0 +1,38 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+env:
+  architectures: linux/amd64,linux/arm64,linux/arm/v7
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build custom env
+        id: custom_env
+        run: echo "TAG_NAME=$(basename ${{ github.ref }})" >> $GITHUB_ENV
+
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Build and Deploy
+        run: docker buildx build --platform=${{ env.architectures }}
+          -t ghcr.io/${{ github.repository }}:${{ env.TAG_NAME }} --push
+
+      - name: Create a GitHub release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.TAG_NAME }}
+          release_name: Release ${{ env.TAG_NAME }}
+          draft: false
+          prerelease: false
+
