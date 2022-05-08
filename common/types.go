@@ -11,26 +11,24 @@ type Mock struct {
 }
 
 type Header struct {
-	Key string
+	Key   string
 	Value string
 }
-
 
 type PostmanHeader struct {
 	Key   string `json:"key"`
 	Value string `json:"value"`
 }
 
-
 type HttpMethod string
 
-const(
-	GET  HttpMethod = "GET"
-	POST HttpMethod = "POST"
-	PUT HttpMethod = "PUT"
-	DELETE HttpMethod = "DELETE"
+const (
+	GET     HttpMethod = "GET"
+	POST    HttpMethod = "POST"
+	PUT     HttpMethod = "PUT"
+	DELETE  HttpMethod = "DELETE"
 	OPTIONS HttpMethod = "OPTIONS"
-	HEAD HttpMethod = "HEAD"
+	HEAD    HttpMethod = "HEAD"
 )
 
 func (m HttpMethod) String() string {

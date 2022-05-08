@@ -17,21 +17,22 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+	"strings"
+
 	"github.com/dvincenz/postman-mockserver/postman"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"os"
-	"strings"
 )
 
 var cfgFile string
 var port int
 
 var rootCmd = &cobra.Command{
-	Use:   "postman-mockserver",
+	Use: "postman-mockserver",
 	Run: func(cmd *cobra.Command, args []string) {
 		if viper.GetString("mode") == "online" {
 			postman.StartServer()
@@ -40,14 +41,11 @@ var rootCmd = &cobra.Command{
 	},
 }
 
-
-
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-
 }
 
 func init() {
@@ -56,17 +54,14 @@ func init() {
 	rootCmd.PersistentFlags().IntVarP(&port, "port", "P", 8080, "starting port")
 	viper.BindPFlag("port", rootCmd.PersistentFlags().Lookup("port"))
 	viper.BindPFlag("config", rootCmd.PersistentFlags().Lookup("config"))
-
 }
-
-
 
 func initConfig() {
 	cfgFile = viper.GetString("config")
 	if cfgFile != "" {
 		if _, err := os.Stat(cfgFile); os.IsNotExist(err) {
 			log.Error().Msg("config file " + cfgFile + " does not exists")
-		}else{
+		} else {
 			log.Info().Msg("Config file: " + viper.GetString("config"))
 
 		}
@@ -82,13 +77,11 @@ func initConfig() {
 		viper.AddConfigPath(home)
 		viper.SetConfigName("/.pms/config")
 
-
 	}
 	viper.SetEnvPrefix("pms")
 	viper.AutomaticEnv() // read in environment variables that match
 	replacer := strings.NewReplacer(".", "_")
 	viper.SetEnvKeyReplacer(replacer)
-
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err != nil {
@@ -99,11 +92,11 @@ func initConfig() {
 }
 
 func initLogger() {
-	if !viper.GetBool("logging.jsonLogging"){
+	if !viper.GetBool("logging.jsonLogging") {
 		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stdout})
 	}
 	loglevel, err := zerolog.ParseLevel(viper.GetString("logging.level"))
-	if err != nil || loglevel == zerolog.NoLevel{
+	if err != nil || loglevel == zerolog.NoLevel {
 		log.Warn().Msg("loglevel not set, default level is set to trace")
 		loglevel = zerolog.TraceLevel
 	}

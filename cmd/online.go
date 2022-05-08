@@ -21,8 +21,6 @@ var onlineCmd = &cobra.Command{
 	},
 }
 
-
-
 func init() {
 	rootCmd.AddCommand(onlineCmd)
 	onlineCmd.Flags().StringVarP(&token, "token", "t", "", "Add Postman token, check readme for more instructions")
@@ -30,5 +28,4 @@ func init() {
 
 	vi := viper.GetViper()
 	log.Trace().Msg(vi.GetString("postman.token"))
-
 }

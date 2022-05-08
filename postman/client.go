@@ -3,19 +3,20 @@ package postman
 import (
 	"encoding/json"
 	"fmt"
-	. "github.com/dvincenz/postman-mockserver/common"
-	"github.com/rs/zerolog/log"
-	"github.com/spf13/viper"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
+
+	. "github.com/dvincenz/postman-mockserver/common"
+	"github.com/rs/zerolog/log"
+	"github.com/spf13/viper"
 )
 
 type Client struct {
-	BaseURL   *url.URL
-	UserAgent string
+	BaseURL    *url.URL
+	UserAgent  string
 	httpClient *http.Client
 }
 
@@ -30,7 +31,7 @@ func getCollection(collectionId string) (postmanCollection, error) {
 	return postmanCollection, err
 }
 
-func getCollections()(Collections, error) {
+func getCollections() (Collections, error) {
 	responseJson, err := getFromPostman("/collections")
 	if err != nil {
 		return Collections{}, err
@@ -44,21 +45,21 @@ func getCollections()(Collections, error) {
 	return postmanCollections, nil
 }
 
-func GetMocksFromPostman() (map[string]Mock, error){
+func GetMocksFromPostman() (map[string]Mock, error) {
 	log.Debug().Msg("load collections from postman...")
 	collections, err := getCollections()
 	if err != nil {
 		return map[string]Mock{}, err
 	}
 	mocks := make(map[string]Mock)
-	for _, collectionOverview  := range collections.Collections {
+	for _, collectionOverview := range collections.Collections {
 		if len(viper.GetStringSlice("postman.collections")) != 0 && strings.ToLower(viper.GetStringSlice("postman.collections")[0]) != "all" {
 			if !isIdInList(viper.GetStringSlice("postman.collections"), collectionOverview.UID) {
 				continue
 			}
 		}
 		//todo make this stuff concurrent
-		collection, err :=  getCollection(collectionOverview.UID)
+		collection, err := getCollection(collectionOverview.UID)
 		if err != nil {
 			log.Error().Msg("error get mock for collection " + collectionOverview.UID + " this collection would be skipped")
 		}
@@ -78,8 +79,7 @@ func isIdInList(list []string, id string) bool {
 	return false
 }
 
-
-func getFromPostman (path string) (string, error){
+func getFromPostman(path string) (string, error) {
 	return requestPostman(path, "GET", nil)
 }
 
@@ -98,7 +98,7 @@ func requestPostman(path string, method string, body io.Reader) (string, error) 
 	if viper.GetString("postman.token") == "" {
 		return "", fmt.Errorf("postman token is not present in config, please check config file")
 	}
-	request, err := http.NewRequest(method, fullUrl.String() + path, body)
+	request, err := http.NewRequest(method, fullUrl.String()+path, body)
 	request.Header.Set("Accept", "application/json")
 	request.Header.Set("X-Api-Key", viper.GetString("postman.token"))
 	response, err := client.httpClient.Do(request)

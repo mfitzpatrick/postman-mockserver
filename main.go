@@ -1,4 +1,3 @@
-
 package main
 
 import (
@@ -9,5 +8,4 @@ import (
 func main() {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	cmd.Execute()
-
 }
