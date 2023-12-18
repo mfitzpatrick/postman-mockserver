@@ -9,5 +9,5 @@ COPY go.sum .
 RUN go mod download
 
 COPY . .
-CMD ["sh", "+e", "-c", "for m in cmd common postman ; do cd /test/$m ; go test ; done"]
+CMD ["sh", "-c", "for m in cmd common postman ; do cd /test/$m ; go test ; done"]
 
