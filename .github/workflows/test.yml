@@ -5,15 +5,30 @@ on:
     branches:
       - "*"
 
+
 env:
   architectures: linux/amd64,linux/arm64,linux/arm/v7
+  test_img: "test-image"
+
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Compile Tests
+        run: docker build -f test.dockerfile -t ${{ env.test_img }} .
+
+      - name: Test Modules
+        run: docker run --rm ${{ env.test_img }}
+
+
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Build custom env
         id: custom_env
@@ -21,11 +36,11 @@ jobs:
 
       - name: Setup docker buildx
         id: docker_buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v3
 
       - name: Add QEMU architectures
         id: docker_qemu
-        uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v3
         with:
           platforms: arm,arm64
 

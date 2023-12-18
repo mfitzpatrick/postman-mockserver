@@ -74,6 +74,15 @@ func reloadCollectionHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 }
 
+func bodyAsString(r *http.Request) string {
+	if r.Body != nil {
+		if bodyBytes, err := ioutil.ReadAll(r.Body); err == nil {
+			return string(bodyBytes)
+		}
+	}
+	return ""
+}
+
 func postmanRouter(w http.ResponseWriter, r *http.Request) {
 	enableCors(&w)
 	if HttpMethod(r.Method) == OPTIONS {
@@ -86,7 +95,8 @@ func postmanRouter(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	path := strings.ToLower(r.Method + urlDecoded)
-	log.Trace().Msg("requested path: " + path)
+	body := bodyAsString(r)
+	log.Trace().Str("path", path).Str("body", body).Msg("request")
 	if mock, ok := mocks[path]; ok {
 		w.Header().Set("Content-Type", "application/json")
 		for _, header := range mock.Header {
@@ -102,7 +112,7 @@ func postmanRouter(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, mock.Body)
 		return
 	}
-	log.Warn().Msg("Requested path not found: " + path)
+	log.Warn().Str("path", path).Msg("Requested path not found")
 	w.WriteHeader(404)
 }
 
